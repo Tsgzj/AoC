@@ -1,0 +1,9 @@
+#+TITLE: README
+
+The project is managed by =deps.edn=
+
+Solution for each day's problem can by run by
+
+#+begin_src shell
+clj -X day[n]/solve
+#+end_src
