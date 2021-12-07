@@ -16,15 +16,20 @@
 
 (defn abs [n] (max n (- n)))
 
-(defn fuel [in target]
-  (let [diff (fn [a b] (abs (- a b)))]
+(defn fuel [f in target]
+  (let [diff (fn [a b] (f (abs (- a b))))]
     (->> in
          (map #(diff target %))
          (reduce +))))
 
-(defn align-pos [in]
+(defn align-pos [f in]
   (let [from (apply min in)
         to (inc (apply max in))]
     (->> (range from to)
-         (map #(fuel in %))
+         (map #(fuel f in %))
          (apply min))))
+
+(defn solve [opts]
+  (pp/pprint (format "Problem one: %d" (align-pos identity input)))
+  (pp/pprint (format "Problem two: %d"
+                     (align-pos #(/ (* % (inc %)) 2) input))))
