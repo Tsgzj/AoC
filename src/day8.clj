@@ -1,7 +1,8 @@
 (ns day8
   (:require [clojure.java.io :as io]
             [clojure.pprint :as pp]
-            [clojure.string :as str]))
+            [clojure.string :as str]
+            [clojure.core.match :refer [match]]))
 
 (defn get-lines [fname]
   (with-open [r (io/reader fname)]
@@ -26,21 +27,35 @@
          unique-seg
          (reduce +))))
 
-;; 11111
-;; 2   3
-;; 2   3
-;; 44444
-;; 5   6
-;; 5   6
-;; 77777
+(defn overlap [s1 s2]
+  (filter (into #{} s1) s2))
 
-(def seg
-  {[:3 :6]                1
-   [:1 :3 :4 :5 :7]       2
-   [:1 :3 :4 :6 :7]       3
-   [:2 :3 :4 :6]          4
-   [:1 :2 :4 :6 :7]       5
-   [:1 :2 :4 :5 :6 :7]    6
-   [:1 :3 :4]             7
-   [:1 :2 :3 :4 :5 :6 :7] 8
-   [:1 :2 :3 :4 :6 :7]    9})
+(defn identify [seg seg1 seg4]
+  (match [(count seg) (count (overlap seg4 seg)) (count (overlap seg1 seg))]
+         [2 _ _] 1
+         [3 _ _] 7
+         [4 _ _] 4
+         [7 _ _] 8
+         [5 2 _] 2
+         [5 3 1] 5
+         [5 3 2] 3
+         [6 4 _] 9
+         [6 3 1] 6
+         [6 3 2] 0))
+
+(defn seek [f coll]
+  (first (filter f coll)))
+
+(defn decode-line [entry output]
+  (let [seg1 (seek #(= 2 (count %)) entry)
+        seg4 (seek #(= 4 (count %)) entry)]
+    (->> (map #(identify % seg1 seg4) output)
+         (reduce #(+ (* %1 10) %2)))))
+
+(def segmentSearch2
+  (->> (map #(decode-line (first %) (last %)) input)
+       (reduce +)))
+
+(defn solve [opts]
+  (pp/pprint (format "Problem one: %d" segmentSearch1))
+  (pp/pprint (format "Problem two: %d" segmentSearch2)))
