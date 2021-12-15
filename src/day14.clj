@@ -35,10 +35,16 @@
         (map (fn [[k v]]
                {(get rules k k) v}) pairs)))
 
-(defn pair-insert [rules pairs]
+(defn transform-map [f m]
   (reduce #(merge-with + %1 %2)
           {}
-          (mapcat re-pair (insert rules pairs))))
+          (mapcat f m)))
+
+(defn pair-insert [rules pairs]
+  (transform-map re-pair (insert rules pairs)))
+
+(defn count-char [pairs]
+  (transform-map (fn [[k v]] (map #(hash-map % v) k)) pairs))
 
 (defn calculate [step]
   (let [diff (fn [freq] (- (apply max freq) (apply min freq)))
@@ -46,12 +52,11 @@
     (->> (iterate #(pair-insert rules %) input)
          (take (inc step))
          last
-         flatten
-         frequencies
+         count-char
          vals
          diff
          half)))
 
 (defn solve [opts]
-  (pp/pprint (format "Problem one: %d" ))
-  (pp/pprint (format "Problem two: \n")))
+  (pp/pprint (format "Problem one: %d" (calculate 10)))
+  (pp/pprint (format "Problem two: %d" (calculate 40))))
