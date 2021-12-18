@@ -47,3 +47,42 @@
         [(->Literal ver typ (bin->num (into data (take 4 (rest rem))))) (drop 5 rem)]
         (recur (drop 5 rem)
                (into data (take 4 (rest rem))))))))
+
+(defmulti parse-operant
+  (fn [bits] (first (drop 6 bits))))
+
+(defmethod parse-operant \0 [bits]
+  (let [len (bin->num (take 15 (drop 7 bits)))]
+    (loop [rem (drop 22 bits)
+           n len
+           oprants []]
+      (if (zero? n)
+        [oprants rem]
+        (let [[n-op n-rem] (parse rem)]
+          (recur n-rem
+                 (- n (- (count rem) (count n-rem)))
+                 (conj oprants n-op)))))))
+
+(defmethod parse-operant \1 [bits]
+  (let [cnt (bin->num (take 11 (drop 7 bits)))]
+    (loop [rem (drop 18 bits)
+           n cnt
+           oprants []]
+      (if (zero? n)
+        [oprants rem]
+        (let [[n-op n-rem] (parse rem)]
+          (recur n-rem
+                 (dec n)
+                 (conj oprants n-op)))))))
+
+(defmethod parse :default [bits]
+  (let [ver (bin->num (take 3 bits))
+        typ (bin->num (take 3 (drop 3 bits)))]
+    (let [[oprants rem] (parse-operant bits)]
+      [(->Operation ver typ :dummy oprants) rem])))
+
+(defn parse-all [bits]
+  (first (parse bits)))
+
+(def part1
+  (verp (parse-all input)))
