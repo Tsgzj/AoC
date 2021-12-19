@@ -75,14 +75,32 @@
                  (dec n)
                  (conj oprants n-op)))))))
 
+(def func
+  {0 #(apply + %)
+   1 #(apply * %)
+   2 #(apply min %)
+   3 #(apply max %)
+   5 #(if (> (first %) (second %)) 1 0)
+   6 #(if (< (first %) (second %)) 1 0)
+   7 #(if (= (first %) (second %)) 1 0)})
+
 (defmethod parse :default [bits]
   (let [ver (bin->num (take 3 bits))
         typ (bin->num (take 3 (drop 3 bits)))]
     (let [[oprants rem] (parse-operant bits)]
-      [(->Operation ver typ :dummy oprants) rem])))
+      [(->Operation ver typ (func typ) oprants) rem])))
 
 (defn parse-all [bits]
   (first (parse bits)))
 
 (def part1
   (verp (parse-all input)))
+
+(def part2
+  (evalp (parse-all input)))
+
+(defn solve [opts]
+  (pp/pprint (format "Problem one: %d" part1))
+  (pp/pprint (format "Problem two: %d" part2)))
+
+(solve nil)
