@@ -21,30 +21,46 @@
               i [-1 0 1]]
           [(+ y j) (+ x i)])))
 
-(defn enhance-pixel [algo img p]
-  (->> (neighbours p)
-       (map #(get-in img % \0))
+(defn get-enhanced-pixel [algo pattern]
+  (->> pattern
        (apply str "2r")
        read-string
        (nth algo)))
 
-(defn enhance [algo img]
+(defn enhance-pixel [algo img p inf-bit]
+  (->> (neighbours p)
+        (map #(get-in img % inf-bit))
+        (get-enhanced-pixel algo)))
+
+(defn enhance [algo [img inf-bit]]
   (let [enhanced-img (for [j (range -1 (inc (count img)))
                            i (range -1 (inc (count (first img))))]
-                       (enhance-pixel algo img [i j]))]
-    (->> enhanced-img
-         (partition (+ 2 (count (first img))))
-         (map vec)
-         vec)))
+                       (enhance-pixel algo img [i j] inf-bit))
+        n-inf-bit (get-enhanced-pixel algo (repeat 9 inf-bit))]
+    [(->> enhanced-img
+          (partition (+ 2 (count (first img))))
+          (map vec)
+          vec)
+     n-inf-bit]))
 
-(defn enhance-nth [algo img times]
-  (nth (iterate (partial enhance algo) img) times))
+(defn enhance-nth [algo [img inf-bit] times]
+  (nth (iterate (partial enhance algo) [img inf-bit]) times))
 
-(defn count-lit [img]
+(defn count-lit [[img inf-bit]]
   (->> img
        (map (fn [row] (filter #(= \1 %) row)))
        (map count)
        (reduce +)))
 
-(def part1
-  (count-lit (enhance-nth enhance-algo image 2)))
+(defn part-n [times]
+  (count-lit (enhance-nth enhance-algo [image \0] times)))
+
+(defn part1 []
+  (part-n 2))
+
+(defn part2 []
+  (part-n 50))
+
+(defn solve [opts]
+  (pp/pprint (format "Problem one: %d" (part1)))
+  (pp/pprint (format "Problem two: %d" (part2))))
