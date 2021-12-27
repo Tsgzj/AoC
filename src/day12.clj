@@ -24,16 +24,18 @@
 
 (def end "end")
 
-(defn dfs [path]
+(defn dfs [path limit]
   (let [cur (peek path)
-        small-caves (filter (complement big-cave?) path)
-        visited (if (empty? small-caves)
-                  #{start}
-                  (set small-caves))
+        small-cv (filter (complement big-cave?) path)
+        visit-cnt (-> small-cv frequencies (dissoc start) vals)
+        visited (if (some #{limit} visit-cnt)
+                  (set small-cv)
+                  #{start})
         neighbours (remove visited (graph cur))]
     (if (= end cur)
       [path]
-      (mapcat #(dfs (conj path %)) neighbours))))
+      (mapcat #(dfs (conj path %) limit) neighbours))))
 
 (defn solve [opts]
-  (pp/pprint (format "Problem one: %d" (count (dfs [start])))))
+  (pp/pprint (format "Problem one: %d" (count (dfs [start] 1))))
+  (pp/pprint (format "Problem two: %d" (count (dfs [start] 2)))))
