@@ -7,7 +7,7 @@ input :: IO String
 input = readFile "./../input/Day1.txt"
 
 parseInput :: String -> [Int]
-parseInput = map sum . map (map read) . splitOn [""] . lines
+parseInput = map (sum . map read) . splitOn [""] . lines
 
 solve1 :: [Int] -> Int
 solve1 = maximum
