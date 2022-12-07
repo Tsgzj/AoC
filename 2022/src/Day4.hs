@@ -15,7 +15,10 @@ parseLine = parseOn (splitOn ",") parsePair
 include :: ((Int, Int), (Int, Int)) -> Bool
 include ((a, b), (c, d)) = a <=c && b >= d ||a >= c && b <= d
 
+part1 :: [String] -> Int
+part1 = length . filter (include . parseLine)
+
 main :: IO ()
 main = do
-  inp <- lines <$> readFile "./../input/Day4.txt"
-  print $ length (filter include (map parseLine inp))
+  input <- lines <$> readFile "./../input/Day4.txt"
+  print $ part1 input
