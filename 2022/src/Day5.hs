@@ -37,15 +37,16 @@ switch (x : xs) n a = x : switch xs (n - 1) a
 applyMove :: ([Char] -> [Char]) -> [[Char]] -> Move -> [[Char]]
 applyMove f c (Move n from to)= switch (switch c (from - 1) nfrom) (to - 1) nto
   where
-    t = f . take n . reverse $ c !! (from - 1)
-    nfrom = reverse . drop n . reverse $ c !! (from - 1)
-    nto = c !! (to - 1) ++ t
+    fromC = c !! (from - 1)
+    (l, r) = splitAt (length fromC - n) fromC
+    nfrom = l
+    nto = c !! (to - 1) ++ f r
 
 part1 :: [Move] -> [[Char]]
-part1 = foldl (applyMove id) crates
+part1 = foldl (applyMove reverse) crates
 
 part2 :: [Move] -> [[Char]]
-part2 = foldl (applyMove reverse) crates 
+part2 = foldl (applyMove id) crates 
 
 main :: IO ()
 main = do
