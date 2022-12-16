@@ -1,5 +1,4 @@
 {-# LANGUAGE TupleSections #-}
-{-# LANGUAGE TupleSections #-}
 {-# LANGUAGE OverloadedStrings #-}
 
 module Day9 where
@@ -10,6 +9,7 @@ import           Data.Attoparsec.Text    hiding ( D
                                                 )
 import           Data.Foldable                  ( minimumBy )
 import           Data.Function                  ( on )
+import           Data.List                      ( scanl' )
 import qualified Data.Set                      as S
 import           Data.Text                      ( Text )
 import qualified Data.Text.IO                  as TIO
@@ -59,23 +59,27 @@ moveTail target tail | tail `elem` targetNeighbour = tail
   tailNeighbour   = neighbours tail
   cand            = S.intersection targetNeighbour tailNeighbour
 
-step :: (Pos, Pos) -> Move -> (Pos, Pos)
-step (head, tail) m = (newHead, newTail)
+step :: (Pos, [Pos]) -> Move -> (Pos, [Pos])
+step (head, tails) m = (newHead, newTails)
  where
-  newHead = moveHead head m
-  newTail = moveTail newHead tail
+  newHead  = moveHead head m
+  newTails = tail $ scanl' moveTail newHead tails
 
-countPos :: [(Pos, Pos)] -> Int
-countPos = length . S.fromList . fmap snd
+countPos :: [(Pos, [Pos])] -> Int
+countPos = length . S.fromList . fmap (last . snd)
+
+solution :: (Pos, [Pos]) -> [Move] -> Int
+solution start = countPos . scanl' step start
 
 part1 :: [Move] -> Int
-part1 moves = countPos $ scanl step ((0, 0), (0, 0)) moves
+part1 = solution ((0, 0), [(0, 0)])
 
 part2 :: [Move] -> Int
-part2 moves = undefined
+part2 = solution ((0, 0), (replicate 9 (0, 0)))
 
 main :: IO ()
 main = do
   input <- TIO.readFile "./../input/Day9.txt"
   let moves = expand $ parseMove input
   print $ part1 moves
+  print $ part2 moves
