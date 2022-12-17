@@ -1,0 +1,47 @@
+cabal-version:      3.0
+name:               AoC2022
+version:            0.1.0.0
+-- synopsis:
+-- description:
+license:            MIT
+license-file:       LICENSE
+author:             Tsgzj
+maintainer:         swx@tsgzj.me
+-- copyright:
+build-type:         Simple
+extra-doc-files:    CHANGELOG.md
+-- extra-source-files:
+
+common warnings
+    ghc-options: -Wall
+
+library
+    import:           warnings
+    exposed-modules:  MyLib
+    -- other-modules:
+    -- other-extensions:
+    build-depends:    attoparsec >= 0.14.4,
+                      base ^>=4.13.0.0,
+                      containers >= 0.6.2.1,
+                      rosezipper >= 0.2,
+                      split >= 0.2.3.5,
+                      text >= 1.2.4.0
+    hs-source-dirs:   src
+    default-language: Haskell2010
+
+executable AoC2022
+    import:           warnings
+    main-is:          Main.hs
+    -- other-modules:
+    -- other-extensions:
+    build-depends:
+                  AoC2022,
+                  attoparsec >= 0.14.4,
+                  base ^>=4.13.0.0,
+                  containers >= 0.6.2.1,
+                  rosezipper >= 0.2,
+                  split >= 0.2.3.5,
+                  text >= 1.2.4.0
+
+    hs-source-dirs:   app
+    default-language: Haskell2010
